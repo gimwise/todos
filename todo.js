@@ -8,88 +8,95 @@ const showActive = document.querySelector('.show-active-btn');
 const showCompleted = document.querySelector('.show-completed-btn');
 const clearAll = document.querySelector('.clear-all-btn');
 
-// todo를 모아놓은 객체 배열
-// id, content, isCompleted
-let todos = [];
-let id = 1;
+let todos = []; // todo를 모아놓은 객체 배열 {id, content, isCompleted}
+let id = 1; // todo 객체의 id가 될 숫자
 
-let isAllCompleted = false;
+let isAllCompleted = false; // todos 속 모든 todo의 isCompleted가 true인지 저장하는 Boolean
 
-let curType = 'all';
-// all, active, completed
+let curType = 'all'; // 현재 필터값을 저장하는 string -> 'all', 'active', 'completed' 
+// (선택)
 
-const setTodos = (newTodos) => todos = newTodos;
 
+// 현재 todos를 매개변수 newTodos로 바꿔주는 함수
+const setTodos = (newTodos) => todos = newTodos; 
+
+// 현재 todos 배열 전체를 반환하는 함수
 const getAllTodos = () => {
     return todos;
 }
 
-// todo-input에 입력한 값 가져오기
+// 현재 input에 입력된 value를 가져와서 처리하는 함수 -> 키보드 enter, 버튼 클릭 2가지로 수행
 const getInputValue = () => {
-    // 엔터키 입력
+    // todoInputElement에 'enter'키가 "keypress"됐을 때, doTrimValue() 실행
     todoInputElement.addEventListener('keypress', (e) =>{
         if(e.key === 'Enter'){
             doTrimValue(e.target.value);
         }
     });
-    // enter 버튼 클릭
+    // input 옆 enter 버튼을 'click'했을 때, doTrimValue() 실행
     todoEnterBtn.addEventListener('click', () =>{
         doTrimValue(todoInputElement.value);
     });
 
-    showAll.addEventListener('click', showType);
+    // show 3가지 버튼은을 'click'했을 때, showType() 실행
+    showAll.addEventListener('click', showType); 
 
     showActive.addEventListener('click', showType);
 
     showCompleted.addEventListener('click', showType);
 
+    // clearAll 버튼을 'click'했을 때, 현재 todos의 모든 내용을 지우기
     clearAll.addEventListener('click', ()=>{
         const blankTodos = [];
         setTodos(blankTodos);
         paintTodos();
+        setLeftItems();
     });
 
-
+    // completeAllBtn 버튼을 'click'했을 때, clickCompleteAll() 실행
+    // (선택)
     completeAllBtn.addEventListener('click', ()=> clickCompleteAll());
+
+    // 남은 할일 계산하기
     setLeftItems();
 };
 
+// 지금 누른 버튼의 id를 읽어와 paintTodos()하기 
+// (선택)
 const showType = (e)=>{
-    const curElement = e.target;
-    const type = e.target.id;
+    const curElement = e.target; // 현재 누른 버튼 요소
+    const type = e.target.id; // 현재 누른 버튼 요소의 id
 
-    if(curType == type) return;
+    if(curType == type) return; // 현재 누른 버튼이 기존의 버튼과 같다면 아무일도 일어나지 않음
 
-    const prevElement = document.querySelector(`#${curType}`);
-    prevElement.classList.remove('selected');
+    const prevElement = document.querySelector(`#${curType}`); // 기존 버튼 요소를 가져와
+    prevElement.classList.remove('selected'); // selected 클래스 지우기
 
-    curElement.classList.add('selected');
-    curType = type;
+    curElement.classList.add('selected'); // 현재 누른 버튼에 selected 클래스 추가하기
+    curType = type; // 현재 type으로 curType 바꾸기
 
-    paintTodos();
+    paintTodos(); // 다시 paintTodos() 실행
 };
 
-// 앞뒤 공백 제거 후, 빈 문자열이 아닐 경우 할일 추가
-const doTrimValue = (val) =>{
-    const trimVal = String(val).trim();
-    if( trimVal !== ''){
-        pushTodos(trimVal);
+// 앞뒤 공백 제거 후, 빈 문자열이 아닐 경우 pushTodos() 실행
+const doTrimValue = (val) =>{ 
+    const trimVal = String(val).trim(); // string으로 형 변환 후, 공백 제거
+    if( trimVal !== ''){ // 빈 문자열이 아니면
+        pushTodos(trimVal); // pushTodos()로 todos 배열에 추가하기
     }
-    else{
-        alert("내용을 입력 후 클릭하세요");
+    else{ // 빈 문자열이면
+        alert("내용을 입력 후 클릭하세요"); // alert 창
     }
-    todoInputElement.value = "";
+    todoInputElement.value = ""; // input의 value 없애기
 };
 
-// todos 객체 배열에 입력받는 값의 객체 추가
+// todos 객체 배열에 객체 추가
 const pushTodos = (context) =>{
-    const newId = id++;
-    const newTodos = [...todos, { id : newId, content : context, isCompleted : false }];
-    // console.log(newTodos);
-    setTodos(newTodos);
-    // console.log(todos);
+    const newId = id++; // 아이디 할당
+    const newTodos = [...todos, { id : newId, content : context, isCompleted : false }]; // 새로운 객체 배열 만들기, spread operator
+    setTodos(newTodos); // setTodos()로 새로운 배열을 todos로 결정하기
 
-    checkIsAllCompleted();
+    checkIsAllCompleted(); // 
     paintTodos();
     setLeftItems();
 }
